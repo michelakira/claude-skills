@@ -1,6 +1,6 @@
 ---
 name: relatorio-prs
-description: Levanta as PRs mergeadas na main (ou outra branch) de um repositório GitHub dentro de um período, classifica cada uma (feature, fix, hotfix, refactor, deps...), avalia o impacto e o risco de ter quebrado algo e gera uma página HTML de apresentação com o resumo. Use quando o usuário passar um link de repositório e pedir o que subiu/foi mergeado num período, changelog, release notes, resumo de PRs, impacto das mudanças ou se alguma PR pode ter causado problema.
+description: Levanta as PRs mergeadas na main (ou outra branch) de um repositório GitHub dentro de um período, classifica cada uma (feature, fix, hotfix, refactor, deps...), avalia o impacto e o risco de ter quebrado algo e gera uma página HTML de apresentação com o resumo. Sem link, usa o repositório do diretório atual. Use quando o usuário pedir o que subiu/foi mergeado num período, changelog, release notes, resumo de PRs, impacto das mudanças ou se alguma PR pode ter causado problema.
 ---
 
 # Relatório de PRs mergeadas
@@ -13,13 +13,23 @@ Extraia do pedido:
 
 | Entrada | Obrigatória | Padrão |
 |---|---|---|
-| Link do repositório (`https://github.com/<owner>/<repo>` ou `owner/repo`) | sim | — |
+| Link do repositório (`https://github.com/<owner>/<repo>` ou `owner/repo`) | não | repositório do diretório atual |
 | Período (início e fim) | sim | — |
-| Branch base | não | `main` |
+| Branch base | não | branch padrão do repositório (normalmente `main`) |
+
+**Sem link do repositório:** descubra pelo diretório atual.
+1. Rode `git remote get-url origin`. Se não houver `origin`, rode `git remote -v` e use o único remote do GitHub; se houver vários, pergunte qual.
+2. Extraia `owner/repo` de qualquer um destes formatos, removendo o `.git` final:
+   - `https://github.com/owner/repo.git`
+   - `git@github.com:owner/repo.git`
+   - `ssh://git@github.com/owner/repo.git`
+3. Descubra a branch padrão com `git symbolic-ref --short refs/remotes/origin/HEAD` (resultado `origin/main` → `main`). Se falhar, use a branch padrão informada pela API do GitHub, ou `main`.
+4. Diga ao usuário qual repositório e branch detectou antes de seguir ("Analisando `owner/repo`, branch `main`").
+
+Se o diretório não for um repositório git, ou o remote não for do GitHub, peça o link.
 
 - Converta períodos relativos para datas absolutas `AAAA-MM-DD` usando a data de hoje: "últimos 15 dias", "setembro", "sprint passada" (pergunte a duração se não souber), "desde 01/09". Datas no formato brasileiro `DD/MM/AAAA` são dia/mês.
-- Se faltar o repositório ou o período, pergunte antes de começar. Não invente período.
-- Se o repositório usar `master` ou `develop` como principal e o usuário não especificou, confira a branch padrão antes.
+- Se faltar o período, pergunte antes de começar. Não invente período.
 
 ## 2. Coletar as PRs
 
