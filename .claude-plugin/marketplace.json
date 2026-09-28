@@ -1,0 +1,19 @@
+{
+  "name": "michelakira-skills",
+  "owner": {
+    "name": "Michel Iwano",
+    "url": "https://github.com/michelakira"
+  },
+  "metadata": {
+    "description": "Coleção pessoal de skills para o Claude",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "michel-skills",
+      "source": "./plugins/michel-skills",
+      "description": "Skills pessoais do Michel",
+      "version": "1.0.0"
+    }
+  ]
+}
