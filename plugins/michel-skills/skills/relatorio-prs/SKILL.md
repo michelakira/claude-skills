@@ -1,6 +1,6 @@
 ---
 name: relatorio-prs
-description: Levanta as PRs mergeadas na main (ou outra branch) de um repositório GitHub dentro de um período, lê o código alterado, classifica cada PR (feature, fix, hotfix, refactor, deps...), mede o alcance das mudanças no código, avalia o risco de ter quebrado algo e gera uma página HTML de apresentação com o resumo. Sem link, usa o repositório do diretório atual. Use quando o usuário pedir o que subiu/foi mergeado num período, changelog, release notes, resumo de PRs, impacto das mudanças ou se alguma PR pode ter causado problema.
+description: Levanta as PRs mergeadas na main (ou outra branch) de um repositório GitHub dentro de um período, lê o código alterado, classifica cada PR (feature, fix, hotfix, refactor, deps...), mede o alcance das mudanças no código, avalia o risco de ter quebrado algo e gera uma página HTML de apresentação com uma visão executiva (para diretoria e gerência) e uma visão técnica. Sem link, usa o repositório do diretório atual. Use quando o usuário pedir o que subiu/foi mergeado num período, changelog, release notes, resumo de PRs, impacto das mudanças, resumo para diretoria/gestão ou se alguma PR pode ter causado problema.
 ---
 
 # Relatório de PRs mergeadas
@@ -140,7 +140,23 @@ Aqui o modelo principal junta tudo e dá a palavra final:
 - **Conflitos:** quando `discordaDaTriagem` vier preenchido, vale a análise do Sonnet para tipo e impacto.
 - **Textos da página:** `resumo` vem do `resumoNegocio`, `impacto` da análise (ou da triagem), `corrige` da triagem. Revise para ficarem claros para quem não é da área técnica.
 - **Pontos de atenção:** 2 a 6 ações concretas, usando `comoValidar` e o alcance (ex.: "`calcularFrete` mudou e é usada em 7 lugares, incluindo o checkout: acompanhar erros de cotação").
-- **Resumo executivo:** 3 a 5 frases com o que foi entregue, o que foi corrigido e onde está o risco.
+- **Resumo técnico (`resumoExecutivo`):** 3 a 5 frases com o que foi entregue, o que foi corrigido e onde está o risco. Aparece na capa da visão técnica.
+- **Visão executiva (`executivo`):** veja a seção 5.1.
+
+### 5.1 Visão executiva
+
+É o que diretoria e gerência veem primeiro. Escreva para quem não conhece o código nem o nome das PRs.
+
+- **Agrupe por tema, não por PR.** Várias PRs da mesma funcionalidade viram uma entrega só. PRs de `deps`, `chore`, `docs`, `test`, `ci` e `refactor` sem efeito visível **não entram** na visão executiva; ficam só na técnica.
+- **Linguagem de negócio.** Proibido: nomes de funções, arquivos, tabelas, endpoints, "PR", "merge", "deploy", "refactor", "migration". Troque "altera `calcularJuros`" por "muda a regra de cálculo dos juros". Diga o efeito para cliente, operação ou receita.
+- **Nada de inventar números de negócio.** Não cite conversão, receita ou volume que não estejam na PR ou no ticket. Use "tende a", "deve" para efeitos esperados.
+- **Campos:**
+  - `manchete`: uma frase, de até ~110 caracteres, com o fato mais importante do período.
+  - `saude.nivel`: `critico` se houve quebra confirmada ainda não resolvida ou risco alto sem ação; `atencao` se houve quebra já resolvida, revert ou risco alto em acompanhamento; `estavel` nos outros casos. `saude.texto`: 1 a 2 frases justificando.
+  - `entregas` (até 6, as mais relevantes primeiro): `tema`, `titulo` (curto, sem prefixo técnico), `descricao`, `beneficio`, `status` (`no-ar`, `parcial` se depende de outra etapa ou flag desligada, `adiado` se foi revertida) e `prs`.
+  - `correcoes` (até 6): problemas que o cliente ou a operação sentiam, com `titulo`, `descricao` (o que acontecia e como está agora) e `prs`. Correções internas sem efeito visível não entram.
+  - `riscos` (até 4): só riscos `alto` e `medio`, cada um com `descricao` em linguagem de negócio, `acao` concreta e `responsavel` (time ou pessoa citada na PR ou ticket; senão `null`).
+  - `proximosPassos` (até 5) e `decisoes` (o que precisa de alguém da gestão decidir; pode ser vazio).
 
 Siga [criterios-risco.md](references/criterios-risco.md) para tipo e risco. Leia o corpo da PR: muitos times descrevem ali o motivo, o link do ticket e o plano de rollback. Use o ticket (Jira etc.) no campo `ticket` quando houver.
 
@@ -156,6 +172,15 @@ Monte um único objeto JSON:
   "fonte": "GitHub MCP",
   "analise": { "triagem": "haiku", "risco": "sonnet", "alcance": true },
   "limitacoes": ["Frases curtas sobre o que não foi possível analisar."],
+  "executivo": {
+    "manchete": "Parcelamento em 12x entrou no ar; o cupom de primeira compra foi adiado após falha.",
+    "saude": { "nivel": "atencao", "texto": "..." },
+    "entregas": [{ "tema": "Checkout", "titulo": "Parcelamento em até 12x", "descricao": "...", "beneficio": "...", "status": "no-ar", "prs": [482] }],
+    "correcoes": [{ "titulo": "Frete errado para o interior de SP", "descricao": "...", "prs": [480] }],
+    "riscos": [{ "titulo": "Valor cobrado no parcelamento", "descricao": "...", "nivel": "alto", "acao": "...", "responsavel": "Time de Pagamentos", "prs": [482] }],
+    "proximosPassos": ["..."],
+    "decisoes": ["..."]
+  },
   "resumoExecutivo": "...",
   "pontosDeAtencao": ["..."],
   "prs": [
@@ -206,11 +231,18 @@ Monte um único objeto JSON:
    - **Se a ferramenta `Artifact` existir:** publique o arquivo como artifact (ícone `chart`, descrição de uma frase com repo e período) e mande o link. O template já segue o contrato de página do Artifact.
    - **Senão:** salve como `relatorio-prs-<repo>-<inicio>_<fim>.html` no diretório atual, adicionando no topo `<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">`, e informe o caminho.
 
-A página tem: capa com números principais, pontos de atenção (risco alto e quebras), panorama por tipo/risco/dia, features, correções, demais mudanças e tabela completa com filtros. Cada PR mostra os motivos do risco marcados como "código" ou "metadados", o alcance no código e como validar. O botão **Apresentar** ativa um slide por seção, navegável com as setas do teclado.
+A página tem duas visões, trocadas no seletor **Executivo / Técnico** do topo:
+- **Executivo** (abre por padrão): manchete, saúde do período, quatro números, entregas por tema, correções, riscos com ação e responsável, próximos passos e decisões.
+- **Técnico**: capa com números, pontos de atenção, panorama por tipo/risco/dia, features, correções, demais mudanças e tabela completa com filtros. Cada PR mostra os motivos do risco marcados como "código" ou "metadados", o alcance no código e como validar.
+
+O botão **Apresentar** mostra um slide por seção da visão escolhida, navegável com as setas do teclado. Para mandar o link já na visão técnica, acrescente `#tecnico` ao final.
+
+Se o usuário pedir só a visão executiva ou só a técnica, gere a página completa do mesmo jeito e diga qual visão abrir.
 
 ## 7. Resposta no chat
 
 Depois de gerar a página, responda de forma curta:
+- A manchete e a saúde do período (da visão executiva).
 - Total de PRs e divisão por tipo.
 - Quantas PRs foram só triadas e quantas tiveram análise aprofundada.
 - PRs de risco alto e quebras confirmadas/suspeitas, com número e motivo em uma linha cada.

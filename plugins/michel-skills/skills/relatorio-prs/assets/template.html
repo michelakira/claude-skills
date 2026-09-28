@@ -58,6 +58,7 @@
   }
 
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   body {
     margin: 0;
     background: var(--bg);
@@ -98,6 +99,53 @@
     border: 0; border-radius: 999px; padding: 9px 14px; cursor: pointer; white-space: nowrap; flex: none;
   }
   .btn:hover { background: var(--accent); }
+  .acoes { display: flex; gap: 8px; align-items: center; flex: none; }
+  .visao { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); }
+  .visao button {
+    font: 600 0.76rem/1 var(--sans); color: var(--ink-2); background: transparent;
+    border: 0; border-radius: 999px; padding: 7px 12px; cursor: pointer; white-space: nowrap;
+  }
+  .visao button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgb(0 0 0 / 0.12); }
+  @media (max-width: 560px) { .topbar-inner { flex-wrap: wrap; } .topbar nav { order: 3; flex-basis: 100%; } .acoes { margin-left: auto; } }
+
+  /* visão executiva */
+  .ex-capa { padding-block: 72px 56px; }
+  .ex-capa .manchete { font-size: clamp(1.8rem, 4.4vw, 3.1rem); line-height: 1.08; max-width: 22ch; }
+  .saude { display: flex; gap: 14px; align-items: flex-start; padding: 16px 18px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); max-width: 75ch; }
+  .saude .sinal { flex: none; display: inline-flex; align-items: center; gap: 8px; font: 600 0.76rem/1 var(--sans); text-transform: uppercase; letter-spacing: 0.06em; padding: 7px 11px; border-radius: 999px; }
+  .saude .sinal::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: currentColor; }
+  .saude.estavel .sinal { color: var(--baixo); background: var(--baixo-bg); }
+  .saude.atencao .sinal { color: var(--medio); background: var(--medio-bg); }
+  .saude.critico .sinal { color: var(--alto); background: var(--alto-bg); }
+  .saude p { color: var(--ink-2); font-size: 1rem; }
+  .ex-nums { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 28px 24px; }
+  .ex-num { display: grid; gap: 6px; padding-top: 14px; border-top: 2px solid var(--ink); }
+  .ex-num.alerta { border-top-color: var(--alto); }
+  .ex-num .valor { font: 700 clamp(2.4rem, 5vw, 3.4rem)/1 var(--display); font-variant-numeric: tabular-nums; }
+  .ex-num.alerta .valor { color: var(--alto); }
+  .ex-num .rotulo { font-size: 0.9rem; color: var(--ink-2); }
+  .entregas { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 16px; }
+  .entrega { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 22px; display: grid; gap: 10px; align-content: start; }
+  .entrega-top { display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+  .entrega h3 { font-family: var(--display); font-size: 1.3rem; font-weight: 700; letter-spacing: -0.01em; }
+  .entrega p { color: var(--ink-2); }
+  .entrega .beneficio { color: var(--ink); font-weight: 500; }
+  .entrega .refs { font: 0.74rem/1.2 var(--mono); color: var(--ink-3); }
+  .status { font: 600 0.7rem/1 var(--sans); padding: 5px 9px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+  .status.no-ar { color: var(--baixo); background: var(--baixo-bg); }
+  .status.parcial { color: var(--medio); background: var(--medio-bg); }
+  .status.adiado { color: var(--alto); background: var(--alto-bg); }
+  .ex-linhas { display: grid; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .ex-linha { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 16px; padding: 16px 20px; border-top: 1px solid var(--line); align-items: start; }
+  .ex-linha:first-child { border-top: 0; }
+  .ex-linha h3 { font-weight: 600; }
+  .ex-linha p { color: var(--ink-2); grid-column: 1 / -1; max-width: 75ch; }
+  .ex-linha .acao { color: var(--ink); }
+  .ex-linha .acao b { font-weight: 600; }
+  .ex-linha .dono { font: 0.76rem/1.2 var(--mono); color: var(--ink-3); grid-column: 1 / -1; }
+  .ex-linha.nivel-alto { box-shadow: inset 4px 0 0 var(--alto); }
+  .ex-linha.nivel-medio { box-shadow: inset 4px 0 0 var(--medio); }
+  .duas-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 28px; align-items: start; }
 
   main { padding-inline: 16px; }
   .slide { max-width: 1080px; margin: 0 auto; padding-block: 56px; border-bottom: 1px solid var(--line); display: grid; gap: 28px; align-content: start; scroll-margin-top: 56px; }
@@ -231,7 +279,13 @@
 <header class="topbar">
   <div class="topbar-inner">
     <nav id="nav" aria-label="Seções"></nav>
-    <button class="btn" id="btn-apresentar" type="button">Apresentar</button>
+    <div class="acoes">
+      <div class="visao" id="visao" role="group" aria-label="Visão" hidden>
+        <button type="button" id="visao-executivo" data-visao="executivo" aria-pressed="true">Executivo</button>
+        <button type="button" id="visao-tecnico" data-visao="tecnico" aria-pressed="false">Técnico</button>
+      </div>
+      <button class="btn" id="btn-apresentar" type="button">Apresentar</button>
+    </div>
   </div>
 </header>
 <main id="app"></main>
@@ -248,6 +302,30 @@
   "fonte": "Dados de exemplo",
   "analise": { "triagem": "haiku", "risco": "sonnet", "alcance": true },
   "limitacoes": ["Diff de #483 não lido por conter só lockfile e package.json."],
+  "executivo": {
+    "manchete": "Parcelamento em 12x entrou no ar; o cupom de primeira compra foi adiado após falha.",
+    "saude": { "nivel": "atencao", "texto": "O período teve uma mudança desfeita em produção (cupom de primeira compra) e duas mudanças de alto impacto no checkout e na integração com parceiros, que estão sendo acompanhadas." },
+    "entregas": [
+      { "tema": "Checkout", "titulo": "Parcelamento em até 12x", "descricao": "Compras acima de R$ 300 podem ser parceladas em até 12 vezes no site e no app.", "beneficio": "Tende a aumentar a conversão em pedidos de ticket alto.", "status": "no-ar", "prs": [482] },
+      { "tema": "Catálogo", "titulo": "Busca por código do produto", "descricao": "Clientes e atendimento encontram produtos pelo código SKU.", "beneficio": "Agiliza o atendimento e a recompra.", "status": "no-ar", "prs": [487] },
+      { "tema": "Marketing", "titulo": "Cupom de primeira compra", "descricao": "Foi publicado e retirado no dia seguinte, após pedidos receberem o desconto em dobro.", "beneficio": "Volta após correção e novos testes.", "status": "adiado", "prs": [488, 491] }
+    ],
+    "correcoes": [
+      { "titulo": "Frete errado para o interior de SP", "descricao": "Clientes de parte do interior pagavam o frete da capital. O valor agora está correto.", "prs": [480] },
+      { "titulo": "Estoque desatualizado em horários de pico", "descricao": "A atualização de estoque com o ERP falhava de madrugada. Voltou a rodar a cada 5 minutos.", "prs": [490] }
+    ],
+    "riscos": [
+      { "titulo": "Valor cobrado no parcelamento", "descricao": "A regra de juros mudou e também afeta o resumo do pedido e a nota fiscal. Entrou sem testes com o gateway de pagamento.", "nivel": "alto", "acao": "Conferir o valor cobrado nas primeiras compras parceladas.", "responsavel": "Time de Pagamentos", "prs": [482] },
+      { "titulo": "App e parceiros lendo o status do pedido", "descricao": "O formato do status do pedido mudou na API. Integrações antigas podem exibir o status errado.", "nivel": "medio", "acao": "Validar com o time mobile antes do próximo release do app.", "responsavel": null, "prs": [486] }
+    ],
+    "proximosPassos": [
+      "Relançar o cupom de primeira compra com testes de cupom combinado.",
+      "Adicionar testes com o gateway de pagamento no fluxo de parcelamento."
+    ],
+    "decisoes": [
+      "Definir a nova data de lançamento do cupom de primeira compra."
+    ]
+  },
   "resumoExecutivo": "Dados de exemplo. Entraram 8 PRs na main: o parcelamento em 12x no checkout foi a principal entrega, junto com a busca por SKU. Foram corrigidos o cálculo de frete para CEPs do interior e um timeout na integração com o ERP. O cupom de primeira compra foi revertido após erro em produção e ainda não está disponível.",
   "pontosDeAtencao": [
     "Acompanhar a taxa de erro do checkout após #482 (parcelamento), que entrou sem testes de integração.",
@@ -541,16 +619,102 @@
 
   document.getElementById('rodape').textContent = 'Gerado em ' + (D.geradoEm ? diaFmt(D.geradoEm, { day: '2-digit', month: 'long', year: 'numeric' }) : '—') + (D.fonte ? ' · Fonte: ' + D.fonte : '') + (D.analise ? ' · Triagem: ' + (D.analise.triagem || '—') + ', análise de risco: ' + (D.analise.risco || '—') + (D.analise.alcance ? ', alcance medido no código' : ', alcance não medido') : '') + ' · Risco é uma estimativa baseada no conteúdo das PRs; quebra confirmada exige evidência (revert, hotfix ou issue).';
 
-  // navegação e modo apresentação
-  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
-  var nav = document.getElementById('nav');
-  var links = slides.map(function (s) { var a = h('a', { href: '#' + s.id }, s.getAttribute('data-nome')); nav.appendChild(a); return a; });
-  if ('IntersectionObserver' in window) {
-    var io = new IntersectionObserver(function (ents) {
-      ents.forEach(function (e) { if (e.isIntersecting) links.forEach(function (a, i) { a.classList.toggle('ativo', slides[i] === e.target); }); });
-    }, { rootMargin: '-40% 0px -55% 0px' });
-    slides.forEach(function (s) { io.observe(s); });
+  // visão executiva: tudo acima é a visão técnica
+  Array.prototype.forEach.call(app.querySelectorAll('.slide'), function (s) { s.setAttribute('data-visao', 'tecnico'); });
+  var E = D.executivo;
+  if (E) {
+    var STATUS = { 'no-ar': 'No ar', parcial: 'Parcial', adiado: 'Adiado' };
+    var SAUDE = { estavel: 'Estável', atencao: 'Atenção', critico: 'Crítico' };
+    var refs = function (arr) { return (arr || []).length ? h('span', { class: 'refs' }, 'PRs ' + arr.map(function (n) { return '#' + n; }).join(', ')) : null; };
+    var exSecao = function (id, eyebrow, titulo, desc) { var s = secao(id, eyebrow, titulo, desc); s.setAttribute('data-visao', 'executivo'); return s; };
+    var entregas = E.entregas || [], correcoes = E.correcoes || [], riscos = E.riscos || [];
+    var noAr = entregas.filter(function (x) { return x.status !== 'adiado'; }).length;
+    var riscosAltos = riscos.filter(function (x) { return x.nivel === 'alto'; }).length;
+    var frag = document.createDocumentFragment();
+
+    var sEx = h('section', { class: 'slide ex-capa', id: 'executivo', 'data-nome': 'Resumo', 'data-visao': 'executivo' },
+      h('div', { class: 'slide-head' },
+        h('span', { class: 'eyebrow' }, 'Resumo executivo · ' + periodoTxt),
+        h('h1', { class: 'manchete' }, E.manchete || nomeRepo),
+        h('span', { class: 'repo' }, nomeRepo + ' · ' + prs.length + ' mudanças publicadas em ' + (D.base || 'main'))),
+      E.saude ? h('div', { class: 'saude ' + (E.saude.nivel || 'estavel') },
+        h('span', { class: 'sinal' }, SAUDE[E.saude.nivel] || E.saude.nivel), h('p', null, E.saude.texto)) : null,
+      h('div', { class: 'ex-nums' },
+        h('div', { class: 'ex-num' }, h('span', { class: 'valor' }, noAr), h('span', { class: 'rotulo' }, noAr === 1 ? 'entrega no ar' : 'entregas no ar')),
+        h('div', { class: 'ex-num' }, h('span', { class: 'valor' }, correcoes.length), h('span', { class: 'rotulo' }, correcoes.length === 1 ? 'problema corrigido' : 'problemas corrigidos')),
+        h('div', { class: 'ex-num' + (nQuebra ? ' alerta' : '') }, h('span', { class: 'valor' }, nQuebra), h('span', { class: 'rotulo' }, nQuebra === 1 ? 'mudança que precisou ser desfeita ou corrigida' : 'mudanças que precisaram ser desfeitas ou corrigidas')),
+        h('div', { class: 'ex-num' + (riscosAltos ? ' alerta' : '') }, h('span', { class: 'valor' }, riscos.length), h('span', { class: 'rotulo' }, riscos.length === 1 ? 'risco em acompanhamento' : 'riscos em acompanhamento'))));
+    frag.appendChild(sEx);
+
+    var sEnt = exSecao('ex-entregas', 'Entregas', 'O que foi entregue');
+    sEnt.appendChild(entregas.length ? h('div', { class: 'entregas' }, entregas.map(function (x) {
+      return h('article', { class: 'entrega' },
+        h('div', { class: 'entrega-top' }, h('span', { class: 'eyebrow' }, x.tema || ''), x.status ? h('span', { class: 'status ' + x.status }, STATUS[x.status] || x.status) : null),
+        h('h3', null, x.titulo),
+        x.descricao ? h('p', null, x.descricao) : null,
+        x.beneficio ? h('p', { class: 'beneficio' }, x.beneficio) : null,
+        refs(x.prs));
+    })) : h('p', { class: 'vazio' }, 'Nenhuma entrega nova no período.'));
+    frag.appendChild(sEnt);
+
+    var sCor = exSecao('ex-correcoes', 'Correções', 'O que foi corrigido');
+    sCor.appendChild(correcoes.length ? h('div', { class: 'ex-linhas' }, correcoes.map(function (x) {
+      return h('div', { class: 'ex-linha' }, h('h3', null, x.titulo), refs(x.prs), x.descricao ? h('p', null, x.descricao) : null);
+    })) : h('p', { class: 'vazio' }, 'Nenhuma correção no período.'));
+    frag.appendChild(sCor);
+
+    var sRis = exSecao('ex-riscos', 'Riscos', 'Riscos e o que estamos fazendo');
+    sRis.appendChild(riscos.length ? h('div', { class: 'ex-linhas' }, riscos.map(function (x) {
+      return h('div', { class: 'ex-linha nivel-' + x.nivel },
+        h('h3', null, x.titulo), pillRisco(x.nivel),
+        x.descricao ? h('p', null, x.descricao) : null,
+        x.acao ? h('p', { class: 'acao' }, h('b', null, 'Ação: '), x.acao) : null,
+        (x.responsavel || (x.prs || []).length) ? h('span', { class: 'dono' }, [x.responsavel ? 'Responsável: ' + x.responsavel : null, (x.prs || []).length ? 'PRs ' + x.prs.map(function (n) { return '#' + n; }).join(', ') : null].filter(Boolean).join(' · ')) : null);
+    })) : h('p', { class: 'vazio' }, 'Nenhum risco relevante em acompanhamento.'));
+    frag.appendChild(sRis);
+
+    if ((E.proximosPassos || []).length || (E.decisoes || []).length) {
+      var sProx = exSecao('ex-proximos', 'Próximos passos', 'O que vem agora');
+      sProx.appendChild(h('div', { class: 'duas-col' },
+        (E.proximosPassos || []).length ? h('div', { class: 'slide-head' }, h('span', { class: 'eyebrow' }, 'Próximos passos'), h('ol', { class: 'atencao-lista' }, E.proximosPassos.map(function (t) { return h('li', null, h('span', null, t)); }))) : null,
+        (E.decisoes || []).length ? h('div', { class: 'slide-head' }, h('span', { class: 'eyebrow' }, 'Decisões necessárias'), h('ol', { class: 'atencao-lista' }, E.decisoes.map(function (t) { return h('li', null, h('span', null, t)); }))) : null));
+      frag.appendChild(sProx);
+    }
+    app.insertBefore(frag, app.firstChild);
   }
+
+  // navegação, visão e modo apresentação
+  var todos = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var nav = document.getElementById('nav');
+  var slides = [], links = [];
+  var io = 'IntersectionObserver' in window ? new IntersectionObserver(function (ents) {
+    ents.forEach(function (e) { if (e.isIntersecting) links.forEach(function (a, i) { a.classList.toggle('ativo', slides[i] === e.target); }); });
+  }, { rootMargin: '-40% 0px -55% 0px' }) : null;
+  var visaoAtual = null;
+  function mostrarVisao(v, rolar) {
+    visaoAtual = v;
+    todos.forEach(function (s) { s.hidden = s.getAttribute('data-visao') !== v; });
+    slides = todos.filter(function (s) { return !s.hidden; });
+    nav.textContent = '';
+    links = slides.map(function (s) { var a = h('a', { href: '#' + s.id }, s.getAttribute('data-nome')); nav.appendChild(a); return a; });
+    if (io) { io.disconnect(); slides.forEach(function (s) { io.observe(s); }); }
+    Array.prototype.forEach.call(document.querySelectorAll('#visao button'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-visao') === v)); });
+    try { localStorage.setItem('relatorio-prs-visao', v); } catch (e) {}
+    if (rolar) window.scrollTo(0, 0);
+  }
+  var inicial = 'tecnico';
+  if (E) {
+    document.getElementById('visao').hidden = false;
+    inicial = 'executivo';
+    try { var salvo = localStorage.getItem('relatorio-prs-visao'); if (salvo === 'tecnico' || salvo === 'executivo') inicial = salvo; } catch (e) {}
+    var alvo = location.hash && document.getElementById(location.hash.slice(1));
+    if (alvo && alvo.getAttribute('data-visao')) inicial = alvo.getAttribute('data-visao');
+    if (location.hash === '#tecnico') inicial = 'tecnico';
+    Array.prototype.forEach.call(document.querySelectorAll('#visao button'), function (b) {
+      b.addEventListener('click', function () { if (b.getAttribute('data-visao') !== visaoAtual) mostrarVisao(b.getAttribute('data-visao'), true); });
+    });
+  }
+  mostrarVisao(inicial, false);
   function atual() {
     var y = window.scrollY + 80, idx = 0;
     slides.forEach(function (s, i) { if (s.offsetTop <= y) idx = i; });
