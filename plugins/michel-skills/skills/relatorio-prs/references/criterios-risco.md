@@ -48,12 +48,34 @@ Some os sinais. Um único sinal crítico já basta para **alto**.
 - Muitas áreas diferentes na mesma PR.
 - Descrição vazia numa PR não trivial.
 
+### Sinais que só aparecem no diff
+
+Leia o código procurando estes padrões. Cada um vale como sinal de atenção, ou crítico se estiver numa área crítica ou tiver alcance grande.
+
+- **Assinatura mudou:** parâmetro novo obrigatório, parâmetro removido, tipo de retorno diferente, função que passou a lançar exceção. Cruze com o alcance: quantos chamadores existem e se foram todos atualizados na mesma PR.
+- **Comportamento mudou sem a assinatura mudar:** valor padrão diferente, arredondamento, ordenação, fuso horário, comparação `==` virando `===`, filtro novo numa query, condição invertida. É o tipo de quebra que passa nos testes existentes.
+- **Tratamento de erro:** `catch` que engole exceção, erro que passou a ser propagado, fallback removido, timeout ou retry alterado.
+- **Dados existentes:** migração sem valor padrão para coluna nova `NOT NULL`, mudança de enum ou de formato gravado, backfill ausente, migração sem `down`.
+- **Consultas:** query nova sem índice em tabela grande, N+1 dentro de loop, `SELECT *` virando junção pesada, remoção de `LIMIT`.
+- **Concorrência e estado:** cache com chave ou TTL novo, variável global, lock removido, operação que deixou de ser idempotente, job que pode rodar em duplicidade.
+- **Contrato:** campo renomeado ou removido em resposta de API, DTO, evento de fila ou webhook; status HTTP diferente; validação mais restritiva na entrada.
+- **Configuração:** leitura de variável de ambiente nova sem valor padrão, feature flag ligada por padrão, URL ou credencial trocada.
+- **Código morto que não está morto:** remoção de função ou rota que o alcance mostra ainda ter usos.
+
+### Alcance
+
+Quando houver medição de alcance (quantos lugares usam o que mudou):
+- Mudança de assinatura ou de comportamento com usos em **3 ou mais áreas diferentes**: suba um nível de risco.
+- Usos em área crítica (pagamento, checkout, autenticação...) de uma função alterada fora dela: trate como se a PR tocasse a área crítica.
+- Poucos usos, todos atualizados na própria PR e com testes: pode baixar a preocupação, dizendo isso no motivo.
+
 ### Baixo
 - Só docs, testes, textos, estilos isolados, dependências *patch*/*minor* de dev, ou mudança pequena, testada e revisada numa área não crítica.
 
 ## Como escrever
 
 - `motivosRisco`: frases curtas e concretas, citando o arquivo ou a mudança. Bom: "Remove coluna `legacy_id` em `orders` (migração 2026_09_03)". Ruim: "Mudança sensível".
+- Marque a `fonte` de cada motivo: `codigo` quando você viu no diff ou no alcance; `metadados` quando vem de tamanho, falta de testes, revisão, tempo de merge ou nome de arquivo. Um risco alto precisa de pelo menos um motivo com fonte `codigo`, a não ser que o diff não tenha sido lido (e então diga isso).
 - `impacto`: diga quem sente a mudança. "Clientes do app veem o novo parcelamento no checkout", "Integrações que usam `GET /v1/orders` passam a receber `status` como enum".
 - Para baixo risco, um motivo basta ("Só documentação").
 - Não trate falta de evidência de quebra como prova de que está tudo bem: o campo `quebra` fica `nao`, mas o risco continua o que os sinais indicam.

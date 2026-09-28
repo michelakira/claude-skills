@@ -144,7 +144,19 @@
   .pr-top .risco { margin-left: auto; }
   .pr .texto { display: grid; gap: 6px; color: var(--ink-2); max-width: 75ch; }
   .pr .texto b { color: var(--ink); font-weight: 600; }
-  .motivos { margin: 0; padding-left: 18px; color: var(--ink-2); display: grid; gap: 2px; font-size: 0.92rem; }
+  .motivos { margin: 0; padding: 0; list-style: none; color: var(--ink-2); display: grid; gap: 6px; font-size: 0.92rem; }
+  .motivos li { display: grid; grid-template-columns: 76px 1fr; gap: 10px; align-items: baseline; }
+  .fonte { font: 500 0.66rem/1 var(--mono); text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 0; border-radius: 4px; text-align: center; }
+  .fonte.codigo { color: var(--accent); background: var(--accent-soft); }
+  .fonte.metadados { color: var(--ink-3); background: var(--surface-2); }
+  .alcance { display: grid; gap: 6px; font-size: 0.86rem; padding: 10px 12px; border-radius: 8px; background: var(--surface-2); }
+  .alcance .eyebrow { font-size: 0.66rem; }
+  .alcance-item { display: flex; gap: 4px 10px; flex-wrap: wrap; align-items: baseline; }
+  .alcance-item code { font: 500 0.82rem/1.3 var(--mono); color: var(--ink); }
+  .alcance-item .ex { font: 0.76rem/1.3 var(--mono); color: var(--ink-3); word-break: break-all; }
+  .validar { font-size: 0.88rem; color: var(--ink-2); }
+  .validar b { color: var(--ink); font-weight: 600; }
+  .limitacoes { margin: 0; padding-left: 18px; font-size: 0.86rem; color: var(--ink-3); display: grid; gap: 2px; max-width: 75ch; }
   .quebra { font-size: 0.9rem; padding: 10px 12px; border-radius: 8px; background: var(--alto-bg); color: var(--ink); }
   .quebra.suspeita { background: var(--medio-bg); }
   .quebra strong { color: var(--alto); }
@@ -234,6 +246,8 @@
   "periodo": { "inicio": "2026-09-01", "fim": "2026-09-15" },
   "geradoEm": "2026-09-16",
   "fonte": "Dados de exemplo",
+  "analise": { "triagem": "haiku", "risco": "sonnet", "alcance": true },
+  "limitacoes": ["Diff de #483 não lido por conter só lockfile e package.json."],
   "resumoExecutivo": "Dados de exemplo. Entraram 8 PRs na main: o parcelamento em 12x no checkout foi a principal entrega, junto com a busca por SKU. Foram corrigidos o cálculo de frete para CEPs do interior e um timeout na integração com o ERP. O cupom de primeira compra foi revertido após erro em produção e ainda não está disponível.",
   "pontosDeAtencao": [
     "Acompanhar a taxa de erro do checkout após #482 (parcelamento), que entrou sem testes de integração.",
@@ -241,14 +255,14 @@
     "Validar com o time mobile a mudança no campo status de GET /v1/orders (#486) antes do próximo release do app."
   ],
   "prs": [
-    { "numero": 480, "titulo": "fix(frete): corrige faixa de CEP do interior de SP", "url": "https://github.com/exemplo/loja-api/pull/480", "autor": "ana-dev", "mergedAt": "2026-09-01T17:40:00Z", "tipo": "fix", "escopo": "frete", "resumo": "O frete para parte do interior de SP era calculado com a tabela da capital.", "impacto": "Clientes dessas cidades passam a ver o valor correto no checkout.", "corrige": "Frete subestimado para CEPs 13000-000 a 13999-999.", "risco": "baixo", "motivosRisco": ["Mudança pequena em ShippingTable, coberta por testes novos"], "breaking": false, "quebra": { "status": "nao", "evidencia": null, "relacionadas": [] }, "adicoes": 42, "remocoes": 6, "arquivos": 3, "revisoes": 2, "testes": true, "areas": ["frete"], "ticket": null },
-    { "numero": 482, "titulo": "feat(checkout): parcelamento em até 12x", "url": "https://github.com/exemplo/loja-api/pull/482", "autor": "bruno-s", "mergedAt": "2026-09-03T14:22:00Z", "tipo": "feat", "escopo": "checkout", "resumo": "Clientes podem parcelar compras acima de R$ 300 em até 12 vezes com juros.", "impacto": "Afeta todo o fluxo de pagamento com cartão, no site e no app.", "corrige": null, "risco": "alto", "motivosRisco": ["Altera o cálculo de juros em PaymentService", "Sem testes de integração com o gateway", "640 linhas em 14 arquivos"], "breaking": false, "quebra": { "status": "nao", "evidencia": null, "relacionadas": [] }, "adicoes": 640, "remocoes": 85, "arquivos": 14, "revisoes": 1, "testes": false, "areas": ["pagamentos", "checkout"], "ticket": "PAY-210" },
-    { "numero": 483, "titulo": "chore(deps): bump axios de 1.7.2 para 1.7.7", "url": "https://github.com/exemplo/loja-api/pull/483", "autor": "dependabot", "mergedAt": "2026-09-04T09:10:00Z", "tipo": "deps", "escopo": "deps", "resumo": "Atualização patch do cliente HTTP.", "impacto": "Nenhum impacto funcional esperado.", "corrige": null, "risco": "baixo", "motivosRisco": ["Versão patch, só lockfile e package.json"], "breaking": false, "quebra": { "status": "nao", "evidencia": null, "relacionadas": [] }, "adicoes": 12, "remocoes": 12, "arquivos": 2, "revisoes": 1, "testes": false, "areas": ["deps"], "ticket": null },
-    { "numero": 486, "titulo": "refactor(orders): status do pedido como enum", "url": "https://github.com/exemplo/loja-api/pull/486", "autor": "carla-m", "mergedAt": "2026-09-08T19:05:00Z", "tipo": "refactor", "escopo": "orders", "resumo": "O status do pedido deixou de ser texto livre e passou a ter valores fixos.", "impacto": "Integrações que leem GET /v1/orders recebem valores em maiúsculas (PAGO, ENVIADO).", "corrige": null, "risco": "medio", "motivosRisco": ["Muda o formato de um campo da API pública", "Título diz refactor, mas altera contrato"], "breaking": true, "quebra": { "status": "nao", "evidencia": null, "relacionadas": [] }, "adicoes": 210, "remocoes": 140, "arquivos": 9, "revisoes": 2, "testes": true, "areas": ["api", "pedidos"], "ticket": null },
-    { "numero": 487, "titulo": "feat(catalogo): busca por SKU", "url": "https://github.com/exemplo/loja-api/pull/487", "autor": "ana-dev", "mergedAt": "2026-09-09T13:30:00Z", "tipo": "feat", "escopo": "catalogo", "resumo": "A busca do catálogo aceita o código SKU além do nome do produto.", "impacto": "Atendimento e clientes encontram produtos pelo código.", "corrige": null, "risco": "baixo", "motivosRisco": ["Novo filtro isolado, com testes"], "breaking": false, "quebra": { "status": "nao", "evidencia": null, "relacionadas": [] }, "adicoes": 96, "remocoes": 4, "arquivos": 4, "revisoes": 2, "testes": true, "areas": ["catalogo"], "ticket": "CAT-88" },
-    { "numero": 488, "titulo": "feat(cupons): cupom de primeira compra", "url": "https://github.com/exemplo/loja-api/pull/488", "autor": "bruno-s", "mergedAt": "2026-09-10T16:00:00Z", "tipo": "feat", "escopo": "cupons", "resumo": "Aplica 10% de desconto automático na primeira compra de cada cliente.", "impacto": "Alterava o total de todos os pedidos de clientes novos.", "corrige": null, "risco": "alto", "motivosRisco": ["Mexe no cálculo do total do pedido", "Migração nova na tabela customers", "Aprovada em 6 minutos"], "breaking": false, "quebra": { "status": "confirmado", "evidencia": "Revertida em #491 após pedidos com desconto duplicado.", "relacionadas": [491] }, "adicoes": 310, "remocoes": 20, "arquivos": 8, "revisoes": 1, "testes": true, "areas": ["cupons", "pedidos"], "ticket": "MKT-45" },
-    { "numero": 490, "titulo": "hotfix(erp): aumenta timeout da sincronização", "url": "https://github.com/exemplo/loja-api/pull/490", "autor": "diego-r", "mergedAt": "2026-09-11T02:15:00Z", "tipo": "hotfix", "escopo": "erp", "resumo": "A sincronização de estoque com o ERP falhava em horários de pico.", "impacto": "Estoque volta a atualizar a cada 5 minutos.", "corrige": "Timeout de 10s estourando na chamada ao ERP durante a madrugada.", "risco": "medio", "motivosRisco": ["Hotfix em produção", "Muda timeout e retries do cliente ERP"], "breaking": false, "quebra": { "status": "nao", "evidencia": null, "relacionadas": [] }, "adicoes": 18, "remocoes": 5, "arquivos": 2, "revisoes": 1, "testes": false, "areas": ["integrações"], "ticket": "OPS-301" },
-    { "numero": 491, "titulo": "Revert \"feat(cupons): cupom de primeira compra\"", "url": "https://github.com/exemplo/loja-api/pull/491", "autor": "carla-m", "mergedAt": "2026-09-11T10:40:00Z", "tipo": "revert", "escopo": "cupons", "resumo": "Desfaz #488 depois de pedidos receberem o desconto duas vezes.", "impacto": "O cupom de primeira compra sai do ar. A migração continua aplicada.", "corrige": "Desconto duplicado em pedidos de clientes novos.", "risco": "alto", "motivosRisco": ["Revert de funcionalidade que já estava em produção", "Não desfaz a migração de customers"], "breaking": false, "quebra": { "status": "nao", "evidencia": null, "relacionadas": [488] }, "adicoes": 20, "remocoes": 290, "arquivos": 7, "revisoes": 1, "testes": false, "areas": ["cupons"], "ticket": "MKT-45" }
+    { "numero": 480, "titulo": "fix(frete): corrige faixa de CEP do interior de SP", "url": "https://github.com/exemplo/loja-api/pull/480", "autor": "ana-dev", "mergedAt": "2026-09-01T17:40:00Z", "tipo": "fix", "escopo": "frete", "resumo": "O frete para parte do interior de SP era calculado com a tabela da capital.", "impacto": "Clientes dessas cidades passam a ver o valor correto no checkout.", "corrige": "Frete subestimado para CEPs 13000-000 a 13999-999.", "risco": "baixo", "motivosRisco": [{ "texto": "Só troca a faixa de CEP em ShippingTable, coberta por testes novos", "fonte": "codigo" }], "analise": "triagem", "breaking": false, "quebra": { "status": "nao", "evidencia": null, "relacionadas": [] }, "adicoes": 42, "remocoes": 6, "arquivos": 3, "revisoes": 2, "testes": true, "areas": ["frete"], "ticket": null },
+    { "numero": 482, "titulo": "feat(checkout): parcelamento em até 12x", "url": "https://github.com/exemplo/loja-api/pull/482", "autor": "bruno-s", "mergedAt": "2026-09-03T14:22:00Z", "tipo": "feat", "escopo": "checkout", "resumo": "Clientes podem parcelar compras acima de R$ 300 em até 12 vezes com juros.", "impacto": "Afeta todo o fluxo de pagamento com cartão, no site e no app.", "corrige": null, "risco": "alto", "motivosRisco": [{ "texto": "calcularJuros passa a arredondar por parcela, e não mais sobre o total, em PaymentService", "fonte": "codigo" }, { "texto": "calcularJuros também é usada no resumo do pedido e na nota fiscal", "fonte": "codigo" }, { "texto": "Sem testes de integração com o gateway", "fonte": "metadados" }], "comoValidar": "Comparar o total cobrado pelo gateway com o exibido no checkout nas primeiras compras parceladas.", "breaking": false, "quebra": { "status": "nao", "evidencia": null, "relacionadas": [] }, "alcance": [{ "simbolo": "calcularJuros", "usos": 4, "exemplos": ["src/checkout/total.ts:42", "src/pedidos/resumo.ts:88", "src/fiscal/nota.ts:131"], "areasAfetadas": ["checkout", "pedidos", "fiscal"] }], "analise": "aprofundada", "adicoes": 640, "remocoes": 85, "arquivos": 14, "revisoes": 1, "testes": false, "areas": ["pagamentos", "checkout"], "ticket": "PAY-210" },
+    { "numero": 483, "titulo": "chore(deps): bump axios de 1.7.2 para 1.7.7", "url": "https://github.com/exemplo/loja-api/pull/483", "autor": "dependabot", "mergedAt": "2026-09-04T09:10:00Z", "tipo": "deps", "escopo": "deps", "resumo": "Atualização patch do cliente HTTP.", "impacto": "Nenhum impacto funcional esperado.", "corrige": null, "risco": "baixo", "motivosRisco": [{ "texto": "Versão patch, só lockfile e package.json", "fonte": "metadados" }], "analise": "triagem", "breaking": false, "quebra": { "status": "nao", "evidencia": null, "relacionadas": [] }, "adicoes": 12, "remocoes": 12, "arquivos": 2, "revisoes": 1, "testes": false, "areas": ["deps"], "ticket": null },
+    { "numero": 486, "titulo": "refactor(orders): status do pedido como enum", "url": "https://github.com/exemplo/loja-api/pull/486", "autor": "carla-m", "mergedAt": "2026-09-08T19:05:00Z", "tipo": "refactor", "escopo": "orders", "resumo": "O status do pedido deixou de ser texto livre e passou a ter valores fixos.", "impacto": "Integrações que leem GET /v1/orders recebem valores em maiúsculas (PAGO, ENVIADO).", "corrige": null, "risco": "medio", "motivosRisco": [{ "texto": "OrderResponse.status passa de texto livre para enum em maiúsculas", "fonte": "codigo" }, { "texto": "Título diz refactor, mas o diff altera o contrato de GET /v1/orders", "fonte": "codigo" }], "comoValidar": "Conferir com o time mobile se o app trata os novos valores de status.", "breaking": true, "quebra": { "status": "nao", "evidencia": null, "relacionadas": [] }, "alcance": [{ "simbolo": "/v1/orders", "usos": 3, "exemplos": ["src/api/routes/orders.ts:12", "src/webhooks/pedido.ts:40"], "areasAfetadas": ["api", "webhooks"] }], "analise": "aprofundada", "adicoes": 210, "remocoes": 140, "arquivos": 9, "revisoes": 2, "testes": true, "areas": ["api", "pedidos"], "ticket": null },
+    { "numero": 487, "titulo": "feat(catalogo): busca por SKU", "url": "https://github.com/exemplo/loja-api/pull/487", "autor": "ana-dev", "mergedAt": "2026-09-09T13:30:00Z", "tipo": "feat", "escopo": "catalogo", "resumo": "A busca do catálogo aceita o código SKU além do nome do produto.", "impacto": "Atendimento e clientes encontram produtos pelo código.", "corrige": null, "risco": "baixo", "motivosRisco": [{ "texto": "Novo filtro isolado em CatalogSearch, com testes", "fonte": "codigo" }], "analise": "triagem", "breaking": false, "quebra": { "status": "nao", "evidencia": null, "relacionadas": [] }, "adicoes": 96, "remocoes": 4, "arquivos": 4, "revisoes": 2, "testes": true, "areas": ["catalogo"], "ticket": "CAT-88" },
+    { "numero": 488, "titulo": "feat(cupons): cupom de primeira compra", "url": "https://github.com/exemplo/loja-api/pull/488", "autor": "bruno-s", "mergedAt": "2026-09-10T16:00:00Z", "tipo": "feat", "escopo": "cupons", "resumo": "Aplica 10% de desconto automático na primeira compra de cada cliente.", "impacto": "Alterava o total de todos os pedidos de clientes novos.", "corrige": null, "risco": "alto", "motivosRisco": [{ "texto": "aplicarDescontos é chamada duas vezes quando o cliente também informa um cupom manual", "fonte": "codigo" }, { "texto": "Migração adiciona first_purchase_at em customers sem backfill", "fonte": "codigo" }, { "texto": "Aprovada 6 minutos depois de aberta", "fonte": "metadados" }], "comoValidar": null, "breaking": false, "quebra": { "status": "confirmado", "evidencia": "Revertida em #491 após pedidos com desconto duplicado.", "relacionadas": [491] }, "alcance": [], "analise": "aprofundada", "adicoes": 310, "remocoes": 20, "arquivos": 8, "revisoes": 1, "testes": true, "areas": ["cupons", "pedidos"], "ticket": "MKT-45" },
+    { "numero": 490, "titulo": "hotfix(erp): aumenta timeout da sincronização", "url": "https://github.com/exemplo/loja-api/pull/490", "autor": "diego-r", "mergedAt": "2026-09-11T02:15:00Z", "tipo": "hotfix", "escopo": "erp", "resumo": "A sincronização de estoque com o ERP falhava em horários de pico.", "impacto": "Estoque volta a atualizar a cada 5 minutos.", "corrige": "Timeout de 10s estourando na chamada ao ERP durante a madrugada.", "risco": "medio", "motivosRisco": [{ "texto": "Timeout do ErpClient sobe de 10s para 30s, com 3 retries", "fonte": "codigo" }, { "texto": "Hotfix em produção, sem testes", "fonte": "metadados" }], "comoValidar": "Acompanhar a duração do job de sincronização de estoque no horário de pico.", "analise": "aprofundada", "breaking": false, "quebra": { "status": "nao", "evidencia": null, "relacionadas": [] }, "adicoes": 18, "remocoes": 5, "arquivos": 2, "revisoes": 1, "testes": false, "areas": ["integrações"], "ticket": "OPS-301" },
+    { "numero": 491, "titulo": "Revert \"feat(cupons): cupom de primeira compra\"", "url": "https://github.com/exemplo/loja-api/pull/491", "autor": "carla-m", "mergedAt": "2026-09-11T10:40:00Z", "tipo": "revert", "escopo": "cupons", "resumo": "Desfaz #488 depois de pedidos receberem o desconto duas vezes.", "impacto": "O cupom de primeira compra sai do ar. A migração continua aplicada.", "corrige": "Desconto duplicado em pedidos de clientes novos.", "risco": "alto", "motivosRisco": [{ "texto": "Revert remove o código do cupom, mas não desfaz a migração de customers", "fonte": "codigo" }], "comoValidar": "Confirmar que nenhum pedido novo recebe o desconto de primeira compra.", "analise": "aprofundada", "breaking": false, "quebra": { "status": "nao", "evidencia": null, "relacionadas": [488] }, "adicoes": 20, "remocoes": 290, "arquivos": 7, "revisoes": 1, "testes": false, "areas": ["cupons"], "ticket": "MKT-45" }
   ]
 }
 </script>
@@ -319,7 +333,20 @@
         p.corrige ? h('p', null, h('b', null, 'Corrige: '), p.corrige) : null,
         p.impacto ? h('p', null, h('b', null, 'Impacto: '), p.impacto) : null
       ),
-      (p.motivosRisco && p.motivosRisco.length) ? h('ul', { class: 'motivos' }, p.motivosRisco.map(function (m) { return h('li', null, m); })) : null,
+      (p.motivosRisco && p.motivosRisco.length) ? h('ul', { class: 'motivos' }, p.motivosRisco.map(function (m) {
+        var o = typeof m === 'string' ? { texto: m, fonte: 'metadados' } : m;
+        var f = o.fonte === 'codigo' ? 'codigo' : 'metadados';
+        return h('li', null, h('span', { class: 'fonte ' + f, title: f === 'codigo' ? 'Visto no código alterado' : 'Deduzido de tamanho, testes, revisão ou nomes de arquivo' }, f === 'codigo' ? 'código' : 'metadados'), h('span', null, o.texto));
+      })) : null,
+      (p.alcance && p.alcance.length) ? h('div', { class: 'alcance' },
+        h('span', { class: 'eyebrow' }, 'Alcance no código'),
+        p.alcance.map(function (a) {
+          return h('div', { class: 'alcance-item' },
+            h('code', null, a.simbolo),
+            h('span', null, 'usado em ' + a.usos + (a.usos === 1 ? ' lugar' : ' lugares') + ((a.areasAfetadas || []).length ? ' · ' + a.areasAfetadas.join(', ') : '')),
+            (a.exemplos || []).length ? h('span', { class: 'ex' }, a.exemplos.join('  ')) : null);
+        })) : null,
+      p.comoValidar ? h('p', { class: 'validar' }, h('b', null, 'Como validar: '), p.comoValidar) : null,
       (q.status === 'confirmado' || q.status === 'suspeita') ? h('p', { class: 'quebra ' + q.status },
         h('strong', null, q.status === 'confirmado' ? 'Quebra confirmada. ' : 'Suspeita de quebra. '),
         q.evidencia || '',
@@ -332,6 +359,7 @@
         h('span', null, fmt(p.arquivos) + ' arquivos'),
         h('span', null, p.revisoes + (p.revisoes === 1 ? ' aprovação' : ' aprovações')),
         h('span', { class: p.testes ? 'ok' : 'falta' }, p.testes ? 'com testes' : 'sem testes'),
+        p.analise ? h('span', null, p.analise === 'aprofundada' ? 'análise aprofundada' : 'só triagem') : null,
         p.ticket ? h('span', null, p.ticket) : null,
         (p.areas || []).length ? h('span', null, p.areas.join(' · ')) : null
       )
@@ -385,6 +413,9 @@
   var sAt = secao('atencao', 'Pontos de atenção', 'O que pode dar problema', 'PRs de risco alto e mudanças com evidência de quebra no período.');
   if ((D.pontosDeAtencao || []).length) sAt.appendChild(h('ol', { class: 'atencao-lista' }, D.pontosDeAtencao.map(function (t) { return h('li', null, h('span', null, t)); })));
   sAt.appendChild(lista(criticas, 'Nenhuma PR de risco alto ou com evidência de quebra no período.'));
+  if ((D.limitacoes || []).length) sAt.appendChild(h('div', { class: 'slide-head' },
+    h('span', { class: 'eyebrow' }, 'Limitações da análise'),
+    h('ul', { class: 'limitacoes' }, D.limitacoes.map(function (t) { return h('li', null, t); }))));
   app.appendChild(sAt);
 
   // panorama
@@ -508,7 +539,7 @@
   }
   render();
 
-  document.getElementById('rodape').textContent = 'Gerado em ' + (D.geradoEm ? diaFmt(D.geradoEm, { day: '2-digit', month: 'long', year: 'numeric' }) : '—') + (D.fonte ? ' · Fonte: ' + D.fonte : '') + ' · Risco é uma estimativa baseada no conteúdo das PRs; quebra confirmada exige evidência (revert, hotfix ou issue).';
+  document.getElementById('rodape').textContent = 'Gerado em ' + (D.geradoEm ? diaFmt(D.geradoEm, { day: '2-digit', month: 'long', year: 'numeric' }) : '—') + (D.fonte ? ' · Fonte: ' + D.fonte : '') + (D.analise ? ' · Triagem: ' + (D.analise.triagem || '—') + ', análise de risco: ' + (D.analise.risco || '—') + (D.analise.alcance ? ', alcance medido no código' : ', alcance não medido') : '') + ' · Risco é uma estimativa baseada no conteúdo das PRs; quebra confirmada exige evidência (revert, hotfix ou issue).';
 
   // navegação e modo apresentação
   var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
