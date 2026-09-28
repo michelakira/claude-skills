@@ -1,0 +1,551 @@
+<title>loja-api · 1–15 set 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --bg: #F2F5F5;
+    --surface: #FFFFFF;
+    --surface-2: #E8EEEF;
+    --ink: #13212A;
+    --ink-2: #475862;
+    --ink-3: #74848C;
+    --line: #D6DFE2;
+    --accent: #0A737C;
+    --accent-soft: #DCEFF0;
+    --add: #1C7F45;
+    --del: #BE3A30;
+    --alto: #BE3A30;   --alto-bg: #FBE8E6;
+    --medio: #A35F00;  --medio-bg: #FCEFD8;
+    --baixo: #2A7549;  --baixo-bg: #E1F1E7;
+    --t-feat: #0A737C;
+    --t-fix: #6A4BB0;
+    --t-hotfix: #BE3A30;
+    --t-revert: #8C2F55;
+    --t-refactor: #2F63A8;
+    --t-perf: #A35F00;
+    --t-outros: #74848C;
+    --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+    --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #0D1618; --surface: #152125; --surface-2: #1C2B30;
+      --ink: #E3ECEE; --ink-2: #A6B6BB; --ink-3: #72848A; --line: #25363B;
+      --accent: #3DB5BE; --accent-soft: #123237;
+      --add: #4DC07F; --del: #EF7268;
+      --alto: #EF7268; --alto-bg: #3A1D1A;
+      --medio: #E5A53C; --medio-bg: #37290F;
+      --baixo: #5BC389; --baixo-bg: #142E1E;
+      --t-feat: #3DB5BE; --t-fix: #A48BE6; --t-hotfix: #EF7268; --t-revert: #E27AA6;
+      --t-refactor: #6FA3E8; --t-perf: #E5A53C; --t-outros: #72848A;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0D1618; --surface: #152125; --surface-2: #1C2B30;
+    --ink: #E3ECEE; --ink-2: #A6B6BB; --ink-3: #72848A; --line: #25363B;
+    --accent: #3DB5BE; --accent-soft: #123237;
+    --add: #4DC07F; --del: #EF7268;
+    --alto: #EF7268; --alto-bg: #3A1D1A;
+    --medio: #E5A53C; --medio-bg: #37290F;
+    --baixo: #5BC389; --baixo-bg: #142E1E;
+    --t-feat: #3DB5BE; --t-fix: #A48BE6; --t-hotfix: #EF7268; --t-revert: #E27AA6;
+    --t-refactor: #6FA3E8; --t-perf: #E5A53C; --t-outros: #72848A;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 15px/1.55 var(--sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+  h1 { font-size: clamp(2rem, 5vw, 3.4rem); line-height: 1.05; font-weight: 700; }
+  h2 { font-size: clamp(1.5rem, 3vw, 2rem); line-height: 1.15; font-weight: 700; }
+  h3 { font-size: 1.05rem; line-height: 1.3; font-weight: 500; font-family: var(--sans); letter-spacing: 0; }
+  p { margin: 0; }
+  .num, .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .eyebrow {
+    font: 500 0.72rem/1.2 var(--mono); text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-3);
+  }
+
+  /* barra superior */
+  .topbar {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+    padding: 10px 16px;
+  }
+  .topbar-inner { max-width: 1080px; margin: 0 auto; display: flex; gap: 12px; align-items: center; justify-content: space-between; }
+  .topbar nav { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; min-width: 0; }
+  .topbar nav a {
+    font: 500 0.78rem/1 var(--sans); color: var(--ink-2); text-decoration: none;
+    padding: 7px 10px; border-radius: 999px; white-space: nowrap;
+  }
+  .topbar nav a:hover { background: var(--surface-2); color: var(--ink); }
+  .topbar nav a.ativo { background: var(--accent-soft); color: var(--accent); }
+  .btn {
+    font: 600 0.8rem/1 var(--sans); color: var(--surface); background: var(--ink);
+    border: 0; border-radius: 999px; padding: 9px 14px; cursor: pointer; white-space: nowrap; flex: none;
+  }
+  .btn:hover { background: var(--accent); }
+
+  main { padding-inline: 16px; }
+  .slide { max-width: 1080px; margin: 0 auto; padding-block: 56px; border-bottom: 1px solid var(--line); display: grid; gap: 28px; align-content: start; scroll-margin-top: 56px; }
+  .slide:last-child { border-bottom: 0; }
+  .slide-head { display: grid; gap: 8px; }
+  .slide-head p { color: var(--ink-2); max-width: 65ch; }
+
+  /* capa */
+  .capa { padding-block: 64px 56px; }
+  .capa .repo { font-family: var(--mono); font-size: 0.9rem; color: var(--ink-2); }
+  .capa .repo a { color: inherit; }
+  .capa .periodo { font-family: var(--display); font-size: clamp(1.1rem, 2.2vw, 1.4rem); color: var(--ink-2); font-weight: 500; }
+  .resumo { font-size: 1.08rem; line-height: 1.6; max-width: 65ch; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .kpi { background: var(--surface); padding: 18px 18px 16px; display: grid; gap: 4px; }
+  .kpi .valor { font: 500 2rem/1 var(--mono); font-variant-numeric: tabular-nums; }
+  .kpi .rotulo { font-size: 0.82rem; color: var(--ink-2); }
+  .kpi.alerta .valor { color: var(--alto); }
+  .diffstat { display: flex; gap: 14px; align-items: center; font-family: var(--mono); font-size: 0.85rem; color: var(--ink-2); flex-wrap: wrap; }
+  .add { color: var(--add); } .del { color: var(--del); }
+
+  /* chips */
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    font: 500 0.72rem/1 var(--mono); padding: 5px 8px; border-radius: 6px;
+    background: var(--surface-2); color: var(--ink-2); white-space: nowrap;
+  }
+  .chip .dot { width: 7px; height: 7px; border-radius: 2px; background: var(--c, var(--t-outros)); }
+  .risco { font: 600 0.72rem/1 var(--sans); padding: 5px 9px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+  .risco.alto { color: var(--alto); background: var(--alto-bg); }
+  .risco.medio { color: var(--medio); background: var(--medio-bg); }
+  .risco.baixo { color: var(--baixo); background: var(--baixo-bg); }
+
+  /* cartão de PR */
+  .lista { display: grid; gap: 14px; }
+  .pr {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 18px 20px; display: grid; gap: 12px;
+  }
+  .pr.sev-alto { border-left: 4px solid var(--alto); }
+  .pr.sev-medio { border-left: 4px solid var(--medio); }
+  .pr-top { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .pr-num { font: 500 0.85rem/1 var(--mono); }
+  .pr-top .risco { margin-left: auto; }
+  .pr .texto { display: grid; gap: 6px; color: var(--ink-2); max-width: 75ch; }
+  .pr .texto b { color: var(--ink); font-weight: 600; }
+  .motivos { margin: 0; padding-left: 18px; color: var(--ink-2); display: grid; gap: 2px; font-size: 0.92rem; }
+  .quebra { font-size: 0.9rem; padding: 10px 12px; border-radius: 8px; background: var(--alto-bg); color: var(--ink); }
+  .quebra.suspeita { background: var(--medio-bg); }
+  .quebra strong { color: var(--alto); }
+  .quebra.suspeita strong { color: var(--medio); }
+  .meta { display: flex; gap: 6px 16px; flex-wrap: wrap; font-size: 0.8rem; color: var(--ink-3); font-family: var(--mono); }
+  .meta .ok { color: var(--baixo); } .meta .falta { color: var(--medio); }
+  .vazio { color: var(--ink-3); padding: 20px; border: 1px dashed var(--line); border-radius: var(--radius); }
+
+  .atencao-lista { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; counter-reset: a; }
+  .atencao-lista li { display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: baseline; max-width: 75ch; }
+  .atencao-lista li::before { counter-increment: a; content: counter(a); font: 500 0.8rem/1 var(--mono); color: var(--accent); background: var(--accent-soft); border-radius: 6px; padding: 6px 0; text-align: center; }
+
+  /* panorama */
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+  .painel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 20px; display: grid; gap: 14px; align-content: start; }
+  .barras { display: grid; gap: 10px; }
+  .barra { display: grid; grid-template-columns: 84px 1fr 36px; gap: 10px; align-items: center; font-size: 0.85rem; }
+  .barra .trilho { height: 12px; background: var(--surface-2); border-radius: 3px; overflow: hidden; }
+  .barra .preench { height: 100%; background: var(--c, var(--accent)); border-radius: 3px; }
+  .barra .n { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .empilhada { display: flex; height: 28px; border-radius: 6px; overflow: hidden; gap: 2px; }
+  .empilhada span { display: block; min-width: 2px; }
+  .legenda { display: flex; gap: 14px; flex-wrap: wrap; font-size: 0.82rem; color: var(--ink-2); }
+  .legenda i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+  .timeline-wrap { overflow-x: auto; }
+  .timeline { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(10px, 1fr); gap: 3px; align-items: end; height: 120px; border-bottom: 1px solid var(--line); position: relative; min-width: 100%; }
+  .timeline .col { background: var(--accent); border-radius: 2px 2px 0 0; min-height: 0; }
+  .timeline .col.zero { background: transparent; }
+  .timeline-eixo { display: flex; justify-content: space-between; font: 0.72rem/1 var(--mono); color: var(--ink-3); padding-top: 6px; }
+  .timeline-max { font: 0.72rem/1 var(--mono); color: var(--ink-3); }
+
+  /* compacto */
+  .compacta { display: grid; gap: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .compacta .linha { display: grid; grid-template-columns: 64px 96px 1fr auto; gap: 12px; align-items: center; padding: 12px 16px; border-top: 1px solid var(--line); font-size: 0.9rem; }
+  .compacta .linha:first-child { border-top: 0; }
+  .compacta .linha .resumo-c { color: var(--ink-2); font-size: 0.85rem; }
+  @media (max-width: 640px) {
+    .compacta .linha { grid-template-columns: 56px 1fr auto; }
+    .compacta .linha .chip { display: none; }
+  }
+
+  /* tabela */
+  .filtros { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .filtros input {
+    font: inherit; font-size: 0.88rem; color: var(--ink); background: var(--surface);
+    border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; min-width: 0; flex: 1 1 220px;
+  }
+  .fbtn {
+    font: 500 0.78rem/1 var(--sans); color: var(--ink-2); background: var(--surface);
+    border: 1px solid var(--line); border-radius: 999px; padding: 8px 12px; cursor: pointer;
+  }
+  .fbtn[aria-pressed="true"] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+  .tabela-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 0.86rem; min-width: 760px; }
+  th, td { text-align: left; padding: 10px 12px; border-top: 1px solid var(--line); vertical-align: top; }
+  thead th { border-top: 0; font: 500 0.7rem/1.2 var(--mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-3); background: var(--surface-2); }
+  td.num, th.num { text-align: right; }
+  .contagem { font-size: 0.82rem; color: var(--ink-3); }
+  .rodape { max-width: 1080px; margin: 0 auto; padding-block: 24px 48px; font-size: 0.8rem; color: var(--ink-3); }
+
+  /* modo apresentação */
+  html.apresentando { scroll-snap-type: y mandatory; }
+  html.apresentando .slide { min-height: calc(100dvh - 56px); scroll-snap-align: start; align-content: center; border-bottom: 0; }
+  html.apresentando .rodape { display: none; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+    .barra .preench, .empilhada span { transition: width .5s ease; }
+  }
+</style>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav id="nav" aria-label="Seções"></nav>
+    <button class="btn" id="btn-apresentar" type="button">Apresentar</button>
+  </div>
+</header>
+<main id="app"></main>
+<footer class="rodape" id="rodape"></footer>
+
+<!-- DADOS: a skill substitui todo o conteúdo desta tag pelo JSON do relatório. Os dados abaixo são de exemplo. -->
+<script id="dados" type="application/json">
+{
+  "repo": "exemplo/loja-api",
+  "repoUrl": "https://github.com/exemplo/loja-api",
+  "base": "main",
+  "periodo": { "inicio": "2026-09-01", "fim": "2026-09-15" },
+  "geradoEm": "2026-09-16",
+  "fonte": "Dados de exemplo",
+  "resumoExecutivo": "Dados de exemplo. Entraram 8 PRs na main: o parcelamento em 12x no checkout foi a principal entrega, junto com a busca por SKU. Foram corrigidos o cálculo de frete para CEPs do interior e um timeout na integração com o ERP. O cupom de primeira compra foi revertido após erro em produção e ainda não está disponível.",
+  "pontosDeAtencao": [
+    "Acompanhar a taxa de erro do checkout após #482 (parcelamento), que entrou sem testes de integração.",
+    "#488 (cupom de primeira compra) foi revertida em #491: a funcionalidade não está em produção.",
+    "Validar com o time mobile a mudança no campo status de GET /v1/orders (#486) antes do próximo release do app."
+  ],
+  "prs": [
+    { "numero": 480, "titulo": "fix(frete): corrige faixa de CEP do interior de SP", "url": "https://github.com/exemplo/loja-api/pull/480", "autor": "ana-dev", "mergedAt": "2026-09-01T17:40:00Z", "tipo": "fix", "escopo": "frete", "resumo": "O frete para parte do interior de SP era calculado com a tabela da capital.", "impacto": "Clientes dessas cidades passam a ver o valor correto no checkout.", "corrige": "Frete subestimado para CEPs 13000-000 a 13999-999.", "risco": "baixo", "motivosRisco": ["Mudança pequena em ShippingTable, coberta por testes novos"], "breaking": false, "quebra": { "status": "nao", "evidencia": null, "relacionadas": [] }, "adicoes": 42, "remocoes": 6, "arquivos": 3, "revisoes": 2, "testes": true, "areas": ["frete"], "ticket": null },
+    { "numero": 482, "titulo": "feat(checkout): parcelamento em até 12x", "url": "https://github.com/exemplo/loja-api/pull/482", "autor": "bruno-s", "mergedAt": "2026-09-03T14:22:00Z", "tipo": "feat", "escopo": "checkout", "resumo": "Clientes podem parcelar compras acima de R$ 300 em até 12 vezes com juros.", "impacto": "Afeta todo o fluxo de pagamento com cartão, no site e no app.", "corrige": null, "risco": "alto", "motivosRisco": ["Altera o cálculo de juros em PaymentService", "Sem testes de integração com o gateway", "640 linhas em 14 arquivos"], "breaking": false, "quebra": { "status": "nao", "evidencia": null, "relacionadas": [] }, "adicoes": 640, "remocoes": 85, "arquivos": 14, "revisoes": 1, "testes": false, "areas": ["pagamentos", "checkout"], "ticket": "PAY-210" },
+    { "numero": 483, "titulo": "chore(deps): bump axios de 1.7.2 para 1.7.7", "url": "https://github.com/exemplo/loja-api/pull/483", "autor": "dependabot", "mergedAt": "2026-09-04T09:10:00Z", "tipo": "deps", "escopo": "deps", "resumo": "Atualização patch do cliente HTTP.", "impacto": "Nenhum impacto funcional esperado.", "corrige": null, "risco": "baixo", "motivosRisco": ["Versão patch, só lockfile e package.json"], "breaking": false, "quebra": { "status": "nao", "evidencia": null, "relacionadas": [] }, "adicoes": 12, "remocoes": 12, "arquivos": 2, "revisoes": 1, "testes": false, "areas": ["deps"], "ticket": null },
+    { "numero": 486, "titulo": "refactor(orders): status do pedido como enum", "url": "https://github.com/exemplo/loja-api/pull/486", "autor": "carla-m", "mergedAt": "2026-09-08T19:05:00Z", "tipo": "refactor", "escopo": "orders", "resumo": "O status do pedido deixou de ser texto livre e passou a ter valores fixos.", "impacto": "Integrações que leem GET /v1/orders recebem valores em maiúsculas (PAGO, ENVIADO).", "corrige": null, "risco": "medio", "motivosRisco": ["Muda o formato de um campo da API pública", "Título diz refactor, mas altera contrato"], "breaking": true, "quebra": { "status": "nao", "evidencia": null, "relacionadas": [] }, "adicoes": 210, "remocoes": 140, "arquivos": 9, "revisoes": 2, "testes": true, "areas": ["api", "pedidos"], "ticket": null },
+    { "numero": 487, "titulo": "feat(catalogo): busca por SKU", "url": "https://github.com/exemplo/loja-api/pull/487", "autor": "ana-dev", "mergedAt": "2026-09-09T13:30:00Z", "tipo": "feat", "escopo": "catalogo", "resumo": "A busca do catálogo aceita o código SKU além do nome do produto.", "impacto": "Atendimento e clientes encontram produtos pelo código.", "corrige": null, "risco": "baixo", "motivosRisco": ["Novo filtro isolado, com testes"], "breaking": false, "quebra": { "status": "nao", "evidencia": null, "relacionadas": [] }, "adicoes": 96, "remocoes": 4, "arquivos": 4, "revisoes": 2, "testes": true, "areas": ["catalogo"], "ticket": "CAT-88" },
+    { "numero": 488, "titulo": "feat(cupons): cupom de primeira compra", "url": "https://github.com/exemplo/loja-api/pull/488", "autor": "bruno-s", "mergedAt": "2026-09-10T16:00:00Z", "tipo": "feat", "escopo": "cupons", "resumo": "Aplica 10% de desconto automático na primeira compra de cada cliente.", "impacto": "Alterava o total de todos os pedidos de clientes novos.", "corrige": null, "risco": "alto", "motivosRisco": ["Mexe no cálculo do total do pedido", "Migração nova na tabela customers", "Aprovada em 6 minutos"], "breaking": false, "quebra": { "status": "confirmado", "evidencia": "Revertida em #491 após pedidos com desconto duplicado.", "relacionadas": [491] }, "adicoes": 310, "remocoes": 20, "arquivos": 8, "revisoes": 1, "testes": true, "areas": ["cupons", "pedidos"], "ticket": "MKT-45" },
+    { "numero": 490, "titulo": "hotfix(erp): aumenta timeout da sincronização", "url": "https://github.com/exemplo/loja-api/pull/490", "autor": "diego-r", "mergedAt": "2026-09-11T02:15:00Z", "tipo": "hotfix", "escopo": "erp", "resumo": "A sincronização de estoque com o ERP falhava em horários de pico.", "impacto": "Estoque volta a atualizar a cada 5 minutos.", "corrige": "Timeout de 10s estourando na chamada ao ERP durante a madrugada.", "risco": "medio", "motivosRisco": ["Hotfix em produção", "Muda timeout e retries do cliente ERP"], "breaking": false, "quebra": { "status": "nao", "evidencia": null, "relacionadas": [] }, "adicoes": 18, "remocoes": 5, "arquivos": 2, "revisoes": 1, "testes": false, "areas": ["integrações"], "ticket": "OPS-301" },
+    { "numero": 491, "titulo": "Revert \"feat(cupons): cupom de primeira compra\"", "url": "https://github.com/exemplo/loja-api/pull/491", "autor": "carla-m", "mergedAt": "2026-09-11T10:40:00Z", "tipo": "revert", "escopo": "cupons", "resumo": "Desfaz #488 depois de pedidos receberem o desconto duas vezes.", "impacto": "O cupom de primeira compra sai do ar. A migração continua aplicada.", "corrige": "Desconto duplicado em pedidos de clientes novos.", "risco": "alto", "motivosRisco": ["Revert de funcionalidade que já estava em produção", "Não desfaz a migração de customers"], "breaking": false, "quebra": { "status": "nao", "evidencia": null, "relacionadas": [488] }, "adicoes": 20, "remocoes": 290, "arquivos": 7, "revisoes": 1, "testes": false, "areas": ["cupons"], "ticket": "MKT-45" }
+  ]
+}
+</script>
+
+<script>
+(function () {
+  var D;
+  try { D = JSON.parse(document.getElementById('dados').textContent); }
+  catch (e) { document.getElementById('app').textContent = 'Não foi possível ler os dados do relatório: ' + e.message; return; }
+  var prs = (D.prs || []).slice().sort(function (a, b) { return new Date(a.mergedAt) - new Date(b.mergedAt); });
+
+  var TIPOS = {
+    feat:     { nome: 'Feature',  cor: '--t-feat' },
+    fix:      { nome: 'Fix',      cor: '--t-fix' },
+    hotfix:   { nome: 'Hotfix',   cor: '--t-hotfix' },
+    revert:   { nome: 'Revert',   cor: '--t-revert' },
+    refactor: { nome: 'Refactor', cor: '--t-refactor' },
+    perf:     { nome: 'Perf',     cor: '--t-perf' },
+    deps:     { nome: 'Deps',     cor: '--t-outros' },
+    chore:    { nome: 'Chore',    cor: '--t-outros' },
+    docs:     { nome: 'Docs',     cor: '--t-outros' },
+    test:     { nome: 'Testes',   cor: '--t-outros' },
+    ci:       { nome: 'CI',       cor: '--t-outros' }
+  };
+  var RISCOS = { alto: 'Alto', medio: 'Médio', baixo: 'Baixo' };
+  var ORDEM_RISCO = { alto: 0, medio: 1, baixo: 2 };
+  function tipoInfo(t) { return TIPOS[t] || { nome: t || 'Outro', cor: '--t-outros' }; }
+
+  function h(tag, attrs) {
+    var el = document.createElement(tag);
+    if (attrs) for (var k in attrs) {
+      var v = attrs[k];
+      if (v == null || v === false) continue;
+      if (k === 'class') el.className = v;
+      else if (k === 'text') el.textContent = v;
+      else if (k === 'style') el.style.cssText = v;
+      else el.setAttribute(k, v);
+    }
+    for (var i = 2; i < arguments.length; i++) add(el, arguments[i]);
+    return el;
+  }
+  function add(el, c) {
+    if (c == null || c === false) return;
+    if (Array.isArray(c)) { c.forEach(function (x) { add(el, x); }); return; }
+    el.appendChild(typeof c === 'object' ? c : document.createTextNode(String(c)));
+  }
+  function fmt(n) { return Number(n || 0).toLocaleString('pt-BR'); }
+  function dataCurta(iso) {
+    var d = new Date(iso);
+    return isNaN(d) ? '' : d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+  }
+  function dia(s) { return new Date(s + 'T00:00:00Z'); }
+  function diaFmt(s, opt) { return dia(s).toLocaleDateString('pt-BR', Object.assign({ timeZone: 'UTC' }, opt)); }
+  function chipTipo(t) {
+    var i = tipoInfo(t);
+    return h('span', { class: 'chip', style: '--c: var(' + i.cor + ')' }, h('span', { class: 'dot' }), i.nome);
+  }
+  function pillRisco(r) { return h('span', { class: 'risco ' + r }, RISCOS[r] || r); }
+  function linkPR(p) { return h('a', { class: 'pr-num', href: p.url, target: '_blank', rel: 'noopener' }, '#' + p.numero); }
+
+  function cartao(p) {
+    var q = p.quebra || {};
+    return h('article', { class: 'pr sev-' + p.risco },
+      h('div', { class: 'pr-top' }, linkPR(p), chipTipo(p.tipo), p.breaking ? h('span', { class: 'chip', style: '--c: var(--alto)' }, h('span', { class: 'dot' }), 'Breaking') : null, pillRisco(p.risco)),
+      h('h3', null, p.titulo),
+      h('div', { class: 'texto' },
+        p.resumo ? h('p', null, p.resumo) : null,
+        p.corrige ? h('p', null, h('b', null, 'Corrige: '), p.corrige) : null,
+        p.impacto ? h('p', null, h('b', null, 'Impacto: '), p.impacto) : null
+      ),
+      (p.motivosRisco && p.motivosRisco.length) ? h('ul', { class: 'motivos' }, p.motivosRisco.map(function (m) { return h('li', null, m); })) : null,
+      (q.status === 'confirmado' || q.status === 'suspeita') ? h('p', { class: 'quebra ' + q.status },
+        h('strong', null, q.status === 'confirmado' ? 'Quebra confirmada. ' : 'Suspeita de quebra. '),
+        q.evidencia || '',
+        (q.relacionadas || []).length ? ' Relacionadas: ' + q.relacionadas.map(function (n) { return '#' + n; }).join(', ') : ''
+      ) : null,
+      h('div', { class: 'meta' },
+        h('span', null, '@' + p.autor),
+        h('span', null, dataCurta(p.mergedAt)),
+        h('span', null, h('span', { class: 'add' }, '+' + fmt(p.adicoes)), ' ', h('span', { class: 'del' }, '−' + fmt(p.remocoes))),
+        h('span', null, fmt(p.arquivos) + ' arquivos'),
+        h('span', null, p.revisoes + (p.revisoes === 1 ? ' aprovação' : ' aprovações')),
+        h('span', { class: p.testes ? 'ok' : 'falta' }, p.testes ? 'com testes' : 'sem testes'),
+        p.ticket ? h('span', null, p.ticket) : null,
+        (p.areas || []).length ? h('span', null, p.areas.join(' · ')) : null
+      )
+    );
+  }
+
+  function secao(id, eyebrow, titulo, desc) {
+    var s = h('section', { class: 'slide', id: id, 'data-nome': eyebrow },
+      h('div', { class: 'slide-head' }, h('span', { class: 'eyebrow' }, eyebrow), h('h2', null, titulo), desc ? h('p', null, desc) : null));
+    return s;
+  }
+  function porRisco(a, b) { return (ORDEM_RISCO[a.risco] - ORDEM_RISCO[b.risco]) || (a.numero - b.numero); }
+  function lista(arr, vazio) {
+    return arr.length ? h('div', { class: 'lista' }, arr.slice().sort(porRisco).map(cartao)) : h('p', { class: 'vazio' }, vazio);
+  }
+
+  var app = document.getElementById('app');
+  var cont = function (f) { return prs.filter(f).length; };
+  var nFeat = cont(function (p) { return p.tipo === 'feat'; });
+  var nFix = cont(function (p) { return p.tipo === 'fix' || p.tipo === 'hotfix'; });
+  var nAlto = cont(function (p) { return p.risco === 'alto'; });
+  var nQuebra = cont(function (p) { return p.quebra && p.quebra.status === 'confirmado'; });
+  var nSusp = cont(function (p) { return p.quebra && p.quebra.status === 'suspeita'; });
+  var totAdd = prs.reduce(function (s, p) { return s + (p.adicoes || 0); }, 0);
+  var totDel = prs.reduce(function (s, p) { return s + (p.remocoes || 0); }, 0);
+  var nomeRepo = (D.repo || '').split('/').pop();
+  var periodoTxt = D.periodo ? diaFmt(D.periodo.inicio, { day: 'numeric', month: 'long' }) + ' a ' + diaFmt(D.periodo.fim, { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+
+  // capa
+  var capa = h('section', { class: 'slide capa', id: 'capa', 'data-nome': 'Resumo' },
+    h('div', { class: 'slide-head' },
+      h('span', { class: 'eyebrow' }, 'PRs mergeadas em ' + (D.base || 'main')),
+      h('h1', null, nomeRepo),
+      h('span', { class: 'repo' }, h('a', { href: D.repoUrl, target: '_blank', rel: 'noopener' }, D.repo)),
+      h('span', { class: 'periodo' }, periodoTxt)
+    ),
+    D.resumoExecutivo ? h('p', { class: 'resumo' }, D.resumoExecutivo) : null,
+    h('div', { class: 'kpis' },
+      h('div', { class: 'kpi' }, h('span', { class: 'valor' }, prs.length), h('span', { class: 'rotulo' }, 'PRs mergeadas')),
+      h('div', { class: 'kpi' }, h('span', { class: 'valor' }, nFeat), h('span', { class: 'rotulo' }, 'Features')),
+      h('div', { class: 'kpi' }, h('span', { class: 'valor' }, nFix), h('span', { class: 'rotulo' }, 'Correções')),
+      h('div', { class: 'kpi' + (nAlto ? ' alerta' : '') }, h('span', { class: 'valor' }, nAlto), h('span', { class: 'rotulo' }, 'Risco alto')),
+      h('div', { class: 'kpi' + (nQuebra ? ' alerta' : '') }, h('span', { class: 'valor' }, nQuebra), h('span', { class: 'rotulo' }, nSusp ? 'Quebras confirmadas (+' + nSusp + ' suspeita' + (nSusp > 1 ? 's' : '') + ')' : 'Quebras confirmadas'))
+    ),
+    h('div', { class: 'diffstat' }, h('span', { class: 'add' }, '+' + fmt(totAdd)), h('span', { class: 'del' }, '−' + fmt(totDel)), h('span', null, 'linhas no período'))
+  );
+  app.appendChild(capa);
+
+  // pontos de atenção
+  var criticas = prs.filter(function (p) { return p.risco === 'alto' || (p.quebra && p.quebra.status !== 'nao' && p.quebra.status); });
+  var sAt = secao('atencao', 'Pontos de atenção', 'O que pode dar problema', 'PRs de risco alto e mudanças com evidência de quebra no período.');
+  if ((D.pontosDeAtencao || []).length) sAt.appendChild(h('ol', { class: 'atencao-lista' }, D.pontosDeAtencao.map(function (t) { return h('li', null, h('span', null, t)); })));
+  sAt.appendChild(lista(criticas, 'Nenhuma PR de risco alto ou com evidência de quebra no período.'));
+  app.appendChild(sAt);
+
+  // panorama
+  var sPan = secao('panorama', 'Panorama', 'Como o período se distribuiu');
+  var contTipo = {};
+  prs.forEach(function (p) { contTipo[p.tipo] = (contTipo[p.tipo] || 0) + 1; });
+  var tiposOrd = Object.keys(contTipo).sort(function (a, b) { return contTipo[b] - contTipo[a]; });
+  var maxTipo = Math.max.apply(null, tiposOrd.map(function (t) { return contTipo[t]; }).concat([1]));
+  var painelTipo = h('div', { class: 'painel' }, h('span', { class: 'eyebrow' }, 'Por tipo'),
+    h('div', { class: 'barras' }, tiposOrd.map(function (t) {
+      var i = tipoInfo(t);
+      return h('div', { class: 'barra' }, h('span', null, i.nome),
+        h('div', { class: 'trilho' }, h('div', { class: 'preench', style: 'width:' + (contTipo[t] / maxTipo * 100) + '%; --c: var(' + i.cor + ')' })),
+        h('span', { class: 'n' }, contTipo[t]));
+    })));
+  var cr = { alto: 0, medio: 0, baixo: 0 };
+  prs.forEach(function (p) { if (cr[p.risco] != null) cr[p.risco]++; });
+  var painelRisco = h('div', { class: 'painel' }, h('span', { class: 'eyebrow' }, 'Por risco'),
+    h('div', { class: 'empilhada', role: 'img', 'aria-label': 'Alto ' + cr.alto + ', médio ' + cr.medio + ', baixo ' + cr.baixo },
+      ['alto', 'medio', 'baixo'].filter(function (r) { return cr[r]; }).map(function (r) {
+        return h('span', { style: 'width:' + (cr[r] / (prs.length || 1) * 100) + '%; background: var(--' + r + ')', title: RISCOS[r] + ': ' + cr[r] });
+      })),
+    h('div', { class: 'legenda' }, ['alto', 'medio', 'baixo'].map(function (r) {
+      return h('span', null, h('i', { style: 'background: var(--' + r + ')' }), RISCOS[r] + ' ', h('span', { class: 'num' }, cr[r]));
+    })));
+
+  // merges por dia (ou semana, se o período for longo)
+  var painelTempo = null;
+  if (D.periodo) {
+    var ini = dia(D.periodo.inicio), fim = dia(D.periodo.fim);
+    var dias = Math.max(1, Math.round((fim - ini) / 864e5) + 1);
+    var passo = dias > 62 ? 7 : 1;
+    var nBal = Math.ceil(dias / passo), baldes = new Array(nBal).fill(0);
+    prs.forEach(function (p) {
+      var d = new Date(p.mergedAt); d = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+      var idx = Math.floor((d - ini) / 864e5 / passo);
+      if (idx >= 0 && idx < nBal) baldes[idx]++;
+    });
+    var maxB = Math.max.apply(null, baldes.concat([1]));
+    painelTempo = h('div', { class: 'painel', style: 'grid-column: 1 / -1' },
+      h('div', { style: 'display:flex; justify-content:space-between; align-items:baseline; gap:12px' },
+        h('span', { class: 'eyebrow' }, passo === 1 ? 'Merges por dia' : 'Merges por semana'),
+        h('span', { class: 'timeline-max' }, 'máx. ' + maxB)),
+      h('div', { class: 'timeline-wrap' },
+        h('div', { class: 'timeline' }, baldes.map(function (n, i) {
+          var dt = new Date(ini.getTime() + i * passo * 864e5);
+          return h('div', { class: 'col' + (n ? '' : ' zero'), style: 'height:' + (n / maxB * 100) + '%', title: dt.toLocaleDateString('pt-BR', { timeZone: 'UTC', day: '2-digit', month: 'short' }) + ': ' + n });
+        }))),
+      h('div', { class: 'timeline-eixo' },
+        h('span', null, diaFmt(D.periodo.inicio, { day: '2-digit', month: 'short' })),
+        h('span', null, diaFmt(D.periodo.fim, { day: '2-digit', month: 'short' }))));
+  }
+  sPan.appendChild(h('div', { class: 'grid-2' }, painelTipo, painelRisco, painelTempo));
+  app.appendChild(sPan);
+
+  // features e correções
+  var sFeat = secao('features', 'Features', 'O que chegou de novo', nFeat + (nFeat === 1 ? ' funcionalidade nova' : ' funcionalidades novas') + ' no período.');
+  sFeat.appendChild(lista(prs.filter(function (p) { return p.tipo === 'feat'; }), 'Nenhuma feature no período.'));
+  app.appendChild(sFeat);
+
+  var corr = prs.filter(function (p) { return ['fix', 'hotfix', 'revert'].indexOf(p.tipo) >= 0; });
+  var sFix = secao('correcoes', 'Correções', 'O que foi corrigido', 'Fixes, hotfixes e reverts, com o problema que cada um resolve.');
+  sFix.appendChild(lista(corr, 'Nenhuma correção no período.'));
+  app.appendChild(sFix);
+
+  var outras = prs.filter(function (p) { return ['feat', 'fix', 'hotfix', 'revert'].indexOf(p.tipo) < 0; }).sort(porRisco);
+  var sOut = secao('outras', 'Demais mudanças', 'Refactors, dependências e manutenção');
+  sOut.appendChild(outras.length ? h('div', { class: 'compacta' }, outras.map(function (p) {
+    return h('div', { class: 'linha' }, linkPR(p), chipTipo(p.tipo),
+      h('div', null, h('div', null, p.titulo), p.resumo ? h('div', { class: 'resumo-c' }, p.resumo) : null),
+      pillRisco(p.risco));
+  })) : h('p', { class: 'vazio' }, 'Nenhuma outra mudança no período.'));
+  app.appendChild(sOut);
+
+  // tabela completa
+  var sTab = secao('todas', 'Todas as PRs', 'Lista completa');
+  var estado = { tipo: null, risco: null, busca: '' };
+  var busca = h('input', { id: 'busca', type: 'search', placeholder: 'Buscar por título, autor ou número', 'aria-label': 'Buscar PRs' });
+  var btns = [];
+  function fb(grupo, valor, rotulo) {
+    var b = h('button', { class: 'fbtn', type: 'button', 'aria-pressed': 'false' }, rotulo);
+    b.addEventListener('click', function () { estado[grupo] = estado[grupo] === valor ? null : valor; render(); });
+    btns.push({ b: b, g: grupo, v: valor });
+    return b;
+  }
+  var filtros = h('div', { class: 'filtros' }, busca,
+    tiposOrd.map(function (t) { return fb('tipo', t, tipoInfo(t).nome); }),
+    ['alto', 'medio', 'baixo'].filter(function (r) { return cr[r]; }).map(function (r) { return fb('risco', r, 'Risco ' + RISCOS[r].toLowerCase()); }));
+  var tbody = h('tbody');
+  var contagem = h('p', { class: 'contagem' });
+  sTab.appendChild(filtros);
+  sTab.appendChild(contagem);
+  sTab.appendChild(h('div', { class: 'tabela-wrap' }, h('table', null,
+    h('thead', null, h('tr', null, ['PR', 'Tipo', 'Título', 'Autor', 'Merge', 'Linhas', 'Risco', 'Quebra'].map(function (c, i) { return h('th', { class: i === 5 ? 'num' : null }, c); }))),
+    tbody)));
+  app.appendChild(sTab);
+  busca.addEventListener('input', function () { estado.busca = busca.value.trim().toLowerCase(); render(); });
+
+  function render() {
+    btns.forEach(function (x) { x.b.setAttribute('aria-pressed', String(estado[x.g] === x.v)); });
+    var vis = prs.filter(function (p) {
+      if (estado.tipo && p.tipo !== estado.tipo) return false;
+      if (estado.risco && p.risco !== estado.risco) return false;
+      if (estado.busca) {
+        var alvo = (p.titulo + ' ' + p.autor + ' #' + p.numero + ' ' + (p.escopo || '')).toLowerCase();
+        if (alvo.indexOf(estado.busca) < 0) return false;
+      }
+      return true;
+    });
+    tbody.textContent = '';
+    vis.forEach(function (p) {
+      var q = (p.quebra && p.quebra.status) || 'nao';
+      tbody.appendChild(h('tr', null,
+        h('td', null, linkPR(p)), h('td', null, chipTipo(p.tipo)), h('td', null, p.titulo),
+        h('td', { class: 'mono' }, p.autor), h('td', { class: 'mono' }, dataCurta(p.mergedAt)),
+        h('td', { class: 'num' }, h('span', { class: 'add' }, '+' + fmt(p.adicoes)), ' ', h('span', { class: 'del' }, '−' + fmt(p.remocoes))),
+        h('td', null, pillRisco(p.risco)),
+        h('td', null, q === 'confirmado' ? h('span', { class: 'risco alto' }, 'Confirmada') : q === 'suspeita' ? h('span', { class: 'risco medio' }, 'Suspeita') : h('span', { class: 'contagem' }, '—'))));
+    });
+    contagem.textContent = vis.length === prs.length ? prs.length + ' PRs' : vis.length + ' de ' + prs.length + ' PRs';
+  }
+  render();
+
+  document.getElementById('rodape').textContent = 'Gerado em ' + (D.geradoEm ? diaFmt(D.geradoEm, { day: '2-digit', month: 'long', year: 'numeric' }) : '—') + (D.fonte ? ' · Fonte: ' + D.fonte : '') + ' · Risco é uma estimativa baseada no conteúdo das PRs; quebra confirmada exige evidência (revert, hotfix ou issue).';
+
+  // navegação e modo apresentação
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var nav = document.getElementById('nav');
+  var links = slides.map(function (s) { var a = h('a', { href: '#' + s.id }, s.getAttribute('data-nome')); nav.appendChild(a); return a; });
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (ents) {
+      ents.forEach(function (e) { if (e.isIntersecting) links.forEach(function (a, i) { a.classList.toggle('ativo', slides[i] === e.target); }); });
+    }, { rootMargin: '-40% 0px -55% 0px' });
+    slides.forEach(function (s) { io.observe(s); });
+  }
+  function atual() {
+    var y = window.scrollY + 80, idx = 0;
+    slides.forEach(function (s, i) { if (s.offsetTop <= y) idx = i; });
+    return idx;
+  }
+  function ir(i) { var s = slides[Math.max(0, Math.min(slides.length - 1, i))]; s.scrollIntoView({ block: 'start' }); }
+  var btn = document.getElementById('btn-apresentar');
+  btn.addEventListener('click', function () {
+    var on = document.documentElement.classList.toggle('apresentando');
+    btn.textContent = on ? 'Sair da apresentação' : 'Apresentar';
+    try {
+      if (on && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function () {});
+      else if (!on && document.fullscreenElement) document.exitFullscreen().catch(function () {});
+    } catch (e) {}
+    if (on) ir(atual());
+  });
+  document.addEventListener('fullscreenchange', function () {
+    if (!document.fullscreenElement && document.documentElement.classList.contains('apresentando')) {
+      document.documentElement.classList.remove('apresentando'); btn.textContent = 'Apresentar';
+    }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (!document.documentElement.classList.contains('apresentando')) return;
+    if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
+    if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].indexOf(e.key) >= 0) { e.preventDefault(); ir(atual() + 1); }
+    else if (['ArrowLeft', 'ArrowUp', 'PageUp'].indexOf(e.key) >= 0) { e.preventDefault(); ir(atual() - 1); }
+  });
+})();
+</script>
